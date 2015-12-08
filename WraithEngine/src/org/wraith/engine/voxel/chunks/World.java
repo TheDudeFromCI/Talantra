@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import org.wraith.engine.util.Algorithms;
 
 public class World{
-	private final ArrayList<ChunkMesh> meshes = new ArrayList();
-	private final ArrayList<ChunkBlocks> blocks = new ArrayList();
+	private final ArrayList<ChunkMesh> meshes = new ArrayList<>();
+	private final ArrayList<ChunkBlocks> blocks = new ArrayList<>();
 	private final ChunkLoader chunkLoader;
 	private final ChunkRenderer chunkRenderer;
 	public World(ChunkLoader chunkLoader, ChunkRenderer chunkRenderer){

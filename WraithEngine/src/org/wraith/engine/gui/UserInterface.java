@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL20;
 import org.wraith.engine.rendering.ShaderProgram;
 
 public class UserInterface{
-	private final ArrayList<UserInterfaceComponent> components = new ArrayList();
+	private final ArrayList<UserInterfaceComponent> components = new ArrayList<>();
 	private final ShaderProgram shader;
 	private final int vboId;
 	public UserInterface(){

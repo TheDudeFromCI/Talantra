@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.wraith.engine.math.Matrix4f;
 
-public class Model implements Comparable{
+public class Model implements Comparable<Model>{
 	private final int vbo;
 	private final int ibo;
 	private final int indexCount;
@@ -25,7 +25,7 @@ public class Model implements Comparable{
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexData, GL15.GL_STATIC_DRAW);
 		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
-	public int compareTo(Object o){
+	public int compareTo(Model o){
 		Model m = (Model)o;
 		return m.protocol.getShader()==protocol.getShader()?0:m.protocol.getShader().getId()>protocol.getShader().getId()?1:-1;
 	}

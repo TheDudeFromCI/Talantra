@@ -3,7 +3,7 @@ package org.wraith.engine.gui;
 import org.lwjgl.opengl.GL11;
 import org.wraith.engine.rendering.Texture;
 
-public class UserInterfaceComponent implements Comparable{
+public class UserInterfaceComponent implements Comparable<UserInterfaceComponent>{
 	private final UserInterface ui;
 	private final Texture texture;
 	private final boolean textureOwner;
@@ -26,7 +26,7 @@ public class UserInterfaceComponent implements Comparable{
 		this.textureOwner = textureOwner;
 		ui.addComponent(this);
 	}
-	public int compareTo(Object o){
+	public int compareTo(UserInterfaceComponent o){
 		UserInterfaceComponent com = (UserInterfaceComponent)o;
 		return z==com.z?0:z<com.z?1:-1;
 	}

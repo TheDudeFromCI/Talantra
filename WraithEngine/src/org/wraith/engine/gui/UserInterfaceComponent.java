@@ -26,8 +26,7 @@ public class UserInterfaceComponent implements Comparable<UserInterfaceComponent
 		this.textureOwner = textureOwner;
 		ui.addComponent(this);
 	}
-	public int compareTo(UserInterfaceComponent o){
-		UserInterfaceComponent com = (UserInterfaceComponent)o;
+	public int compareTo(UserInterfaceComponent com){
 		return z==com.z?0:z<com.z?1:-1;
 	}
 	public void dispose(){

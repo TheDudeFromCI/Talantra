@@ -25,8 +25,7 @@ public class Model implements Comparable<Model>{
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexData, GL15.GL_STATIC_DRAW);
 		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
-	public int compareTo(Model o){
-		Model m = (Model)o;
+	public int compareTo(Model m){
 		return m.protocol.getShader()==protocol.getShader()?0:m.protocol.getShader().getId()>protocol.getShader().getId()?1:-1;
 	}
 	public void dispose(){

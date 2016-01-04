@@ -3,9 +3,10 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/WraithEngine/bin"/>
-	<classpathentry kind="lib" path="Assets/LWJGL/lwjgl.jar">
+	<classpathentry kind="lib" path="C:/Users/TheDudeFromCI/Documents/LWJGL/jar/lwjgl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="TalantraClient/Assets/LWJGL"/>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/TheDudeFromCI/Documents/LWJGL/doc/javadoc.zip!/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/TheDudeFromCI/Documents/LWJGL/native"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

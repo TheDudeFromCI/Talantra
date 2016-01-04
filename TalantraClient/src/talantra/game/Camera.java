@@ -10,6 +10,7 @@ public class Camera{
 	private static final Vector3f X_AXIS = new Vector3f(1, 0, 0);
 	private static final Vector3f Y_AXIS = new Vector3f(0, 1, 0);
 	private final Vector3f temp = new Vector3f();
+	private final Vector3f temp2 = new Vector3f();
 	private float x;
 	private float y;
 	private float z;
@@ -20,6 +21,7 @@ public class Camera{
 	private FloatBuffer buf;
 	public Camera(){
 		mat = new Matrix4f();
+		proMat = new Matrix4f();
 		buf = BufferUtils.createFloatBuffer(16);
 		updateMatrix();
 	}
@@ -45,6 +47,24 @@ public class Camera{
 	}
 	public float getZ(){
 		return z;
+	}
+	public void lookAt(float x, float y, float z){
+		temp.set(x, y, z);
+		temp2.set(this.x, this.y, this.z);
+		Vector3f f = (Vector3f)Vector3f.sub(temp, temp2, null).normalise();
+		Vector3f s = (Vector3f)Vector3f.cross(f, Y_AXIS, null).normalise();
+		Vector3f u = Vector3f.cross(s, f, null);
+		mat.setIdentity();
+		mat.m00 = s.x;
+		mat.m10 = s.y;
+		mat.m20 = s.z;
+		mat.m01 = u.x;
+		mat.m11 = u.y;
+		mat.m21 = u.z;
+		mat.m02 = -f.x;
+		mat.m12 = -f.y;
+		mat.m22 = -f.z;
+		mat.translate((Vector3f)temp2.negate());
 	}
 	public void move(float x, float y, float z){
 		this.x += x;

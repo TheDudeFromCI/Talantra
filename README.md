@@ -3,9 +3,10 @@ Talantra is a open-world, block-based, sandbox game designed for the pc. It was 
 
 
 # Version
-Talantra is currently in a very, very, very early prototype stage. Many changes to the graphics and storyline will occur throughout it's development, and will not seem to take any real form for many months.
 
-V 0.0.1
+v0.0.1
+
+Talantra is currently in a very, very, very early prototype stage. Many changes to the graphics and storyline will occur throughout it's development, and will not seem to take any real form for many months.
 
 
 # Wraithaven Games

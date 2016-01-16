@@ -12,7 +12,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.PixelFormat;
 import de.matthiasmann.twl.utils.PNGDecoder;
@@ -35,38 +34,48 @@ public class Talantra{
 		}
 	}
 	public static void gameLoop(){
-		// TODO Handle game loop.
 		Camera camera = new Camera();
-		camera.setPerspective(70, 4/3f, 0.1f, 100.0f);
-		camera.moveTo(0, 0, 3);
-		TestModel testModel = new TestModel();
+		{
+			camera.setPerspective(70, 4/3f, 0.1f, 100.f);
+			camera.moveTo(0, 1, 3);
+			camera.lookAt(0, 0, 0);
+		}
 		File vertexShader = new File("C:/Users/TheDudeFromCI/Desktop/Vertex.txt");
 		File fragmentShader = new File("C:/Users/TheDudeFromCI/Desktop/Fragment.txt");
 		ShaderProgram shader = new ShaderProgram(vertexShader, null, fragmentShader);
-		shader.bind();
-		int projectionMatrixLocation = GL20.glGetUniformLocation(shader.getId(), "projectionMatrix");
-		int viewMatrixLocation = GL20.glGetUniformLocation(shader.getId(), "viewMatrix");
-		int modelMatrixLocation = GL20.glGetUniformLocation(shader.getId(), "modelMatrix");
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		int texIds = GL11.glGenTextures();
-		texIds = loadPNGTexture("C:/Users/TheDudeFromCI/Desktop/Texture1.png", GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texIds);
+		shader.loadUniforms("projectionMatrix", "viewMatrix", "modelMatrix");
+		Universe uni = new Universe();
+		{
+			uni.setCamera(camera);
+			uni.setShader(shader, 0, 1, 2);
+			uni.addModel(new Model());
+			uni.getFlags().setDepthTest(true);
+			uni.getFlags().setTexture2D(true);
+			uni.getFlags().setCullFace(false);
+			uni.getFlags().setWireframe(false);
+		}
+		int texIds;
+		{
+			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+			texIds = GL11.glGenTextures();
+			texIds = loadPNGTexture("C:/Users/TheDudeFromCI/Desktop/Texture1.png", GL13.GL_TEXTURE0);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, texIds);
+		}
 		while(!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)&&!Display.isCloseRequested()){
-			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-			testModel.update();
-			camera.lookAt(0, -testModel.getY(), 0);
-			camera.dumpToShader(viewMatrixLocation, projectionMatrixLocation);
-			testModel.render(modelMatrixLocation);
+			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT|GL11.GL_DEPTH_BUFFER_BIT);
+			uni.update(0, 0);
+			uni.render();
 			Display.sync(60);
 			Display.update();
 		}
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-		GL11.glDeleteTextures(texIds);
-		shader.unbind();
+		{
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+			GL11.glDeleteTextures(texIds);
+		}
 		shader.dispose();
 	}
 	public static void initalizeGame(){
-		// TODO Initalize game.
+		UniverseFlags.initalize();
 	}
 	public static void main(String[] args){
 		System.out.println("Starting Talanta.");

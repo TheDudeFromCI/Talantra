@@ -96,6 +96,9 @@ public class ShaderProgram{
 	public int getId(){
 		return program;
 	}
+	public int[] getUniformLocations(){
+		return uniforms;
+	}
 	public void loadAttributes(String... att){
 		GL20.glUseProgram(program);
 		attributes = new int[att.length];

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Universe{
-	private final ArrayList<Model> models = new ArrayList();
+	private final ArrayList<Model> models = new ArrayList<Model>();
 	public void addModel(Model model){
 		models.add(model);
 	}

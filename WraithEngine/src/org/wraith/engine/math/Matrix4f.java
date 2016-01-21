@@ -1,41 +1,9 @@
-/*
- * The MIT License (MIT) Copyright © 2015, Heiko Brumme Permission is hereby granted, free of charge, to any person obtaining a copy of this software
- * and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to
- * do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial
- * portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
- * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
 package org.wraith.engine.math;
 
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 
-/**
- * This class represents a 4x4-Matrix. GLSL equivalent to mat4.
- *
- * @author Heiko Brumme
- */
 public class Matrix4f{
-	/**
-	 * Creates a perspective projection matrix. Similar to <code>glFrustum(left, right, bottom, top, near, far)</code>.
-	 *
-	 * @param left
-	 *            Coordinate for the left vertical clipping pane
-	 * @param right
-	 *            Coordinate for the right vertical clipping pane
-	 * @param bottom
-	 *            Coordinate for the bottom horizontal clipping pane
-	 * @param top
-	 *            Coordinate for the bottom horizontal clipping pane
-	 * @param near
-	 *            Coordinate for the near depth clipping pane, must be positive
-	 * @param far
-	 *            Coordinate for the far depth clipping pane, must be positive
-	 * @return Perspective matrix
-	 */
 	public static Matrix4f frustum(float left, float right, float bottom, float top, float near, float far){
 		Matrix4f frustum = new Matrix4f();
 		float a = (right+left)/(right-left);
@@ -52,23 +20,6 @@ public class Matrix4f{
 		frustum.m33 = 0f;
 		return frustum;
 	}
-	/**
-	 * Creates a orthographic projection matrix. Similar to <code>glOrtho(left, right, bottom, top, near, far)</code>.
-	 *
-	 * @param left
-	 *            Coordinate for the left vertical clipping pane
-	 * @param right
-	 *            Coordinate for the right vertical clipping pane
-	 * @param bottom
-	 *            Coordinate for the bottom horizontal clipping pane
-	 * @param top
-	 *            Coordinate for the bottom horizontal clipping pane
-	 * @param near
-	 *            Coordinate for the near depth clipping pane
-	 * @param far
-	 *            Coordinate for the far depth clipping pane
-	 * @return Orthographic matrix
-	 */
 	public static Matrix4f orthographic(float left, float right, float bottom, float top, float near, float far){
 		Matrix4f ortho = new Matrix4f();
 		float tx = -(right+left)/(right-left);
@@ -82,50 +33,44 @@ public class Matrix4f{
 		ortho.m23 = tz;
 		return ortho;
 	}
-	/**
-	 * Creates a perspective projection matrix. Similar to <code>gluPerspective(fovy, aspec, zNear, zFar)</code>.
-	 *
-	 * @param fovy
-	 *            Field of view angle in degrees
-	 * @param aspect
-	 *            The aspect ratio is the ratio of width to height
-	 * @param near
-	 *            Distance from the viewer to the near clipping plane, must be positive
-	 * @param far
-	 *            Distance from the viewer to the far clipping plane, must be positive
-	 * @return Perspective matrix
-	 */
 	public static Matrix4f perspective(float fovy, float aspect, float near, float far){
 		Matrix4f perspective = new Matrix4f();
-		float f = (float)(1f/Math.tan(Math.toRadians(fovy)/2f));
-		perspective.m00 = f/aspect;
-		perspective.m11 = f;
-		perspective.m22 = (far+near)/(near-far);
-		perspective.m32 = -1f;
-		perspective.m23 = 2f*far*near/(near-far);
-		perspective.m33 = 0f;
+		float y = (float)(1/Math.tan(Math.toRadians(fovy/2f)));
+		float x = y/aspect;
+		float frus = far-near;
+		perspective.m00 = x;
+		perspective.m11 = y;
+		perspective.m22 = -((far+near)/frus);
+		perspective.m23 = -1;
+		perspective.m32 = -((2*near*far)/frus);
+		perspective.m33 = 0;
 		return perspective;
 	}
-	/**
-	 * Creates a rotation matrix. Similar to <code>glRotate(angle, x, y, z)</code>.
-	 *
-	 * @param angle
-	 *            Angle of rotation in degrees
-	 * @param x
-	 *            x coordinate of the rotation vector
-	 * @param y
-	 *            y coordinate of the rotation vector
-	 * @param z
-	 *            z coordinate of the rotation vector
-	 * @return Rotation matrix
-	 */
+	public static Matrix4f lookAt(Vector3f eye, Vector3f center, Vector3f up){
+		Vector3f f = Vector3f.normalize(Vector3f.subtract(center, eye));
+		Vector3f u = Vector3f.normalize(up);
+		Vector3f s = Vector3f.normalize(Vector3f.cross(f, u));
+		u = Vector3f.cross(s, f);
+		Matrix4f res = new Matrix4f();
+		res.m00 = s.x;
+		res.m10 = s.y;
+		res.m20 = s.z;
+		res.m01 = u.x;
+		res.m11 = u.y;
+		res.m21 = u.z;
+		res.m02 = -f.x;
+		res.m12 = -f.y;
+		res.m22 = -f.z;
+		res.translate(-eye.x, -eye.y, -eye.z);
+		return res;
+	}
 	public static Matrix4f rotate(float angle, float x, float y, float z){
 		Matrix4f rotation = new Matrix4f();
 		float c = (float)Math.cos(Math.toRadians(angle));
 		float s = (float)Math.sin(Math.toRadians(angle));
 		Vector3f vec = new Vector3f(x, y, z);
 		if(vec.length()!=1f){
-			vec = vec.normalize();
+			vec.normalize();
 			x = vec.x;
 			y = vec.y;
 			z = vec.z;
@@ -141,17 +86,6 @@ public class Matrix4f{
 		rotation.m22 = z*z*(1f-c)+c;
 		return rotation;
 	}
-	/**
-	 * Creates a scaling matrix. Similar to <code>glScale(x, y, z)</code>.
-	 *
-	 * @param x
-	 *            Scale factor along the x coordinate
-	 * @param y
-	 *            Scale factor along the y coordinate
-	 * @param z
-	 *            Scale factor along the z coordinate
-	 * @return Scaling matrix
-	 */
 	public static Matrix4f scale(float x, float y, float z){
 		Matrix4f scaling = new Matrix4f();
 		scaling.m00 = x;
@@ -159,46 +93,21 @@ public class Matrix4f{
 		scaling.m22 = z;
 		return scaling;
 	}
-	/**
-	 * Creates a translation matrix. Similar to <code>glTranslate(x, y, z)</code>.
-	 *
-	 * @param x
-	 *            x coordinate of translation vector
-	 * @param y
-	 *            y coordinate of translation vector
-	 * @param z
-	 *            z coordinate of translation vector
-	 * @return Translation matrix
-	 */
-	public static Matrix4f translate(float x, float y, float z){
-		Matrix4f translation = new Matrix4f();
-		translation.m03 = x;
-		translation.m13 = y;
-		translation.m23 = z;
-		return translation;
+	public static Matrix4f multiply(Matrix4f left, Matrix4f right){
+		Matrix4f result = new Matrix4f(left);
+		result.multiply(right);
+		return result;
 	}
 	private float m00, m01, m02, m03;
 	private float m10, m11, m12, m13;
 	private float m20, m21, m22, m23;
 	private float m30, m31, m32, m33;
-	/**
-	 * Creates a 4x4 identity matrix.
-	 */
 	public Matrix4f(){
 		setIdentity();
 	}
-	/**
-	 * Creates a 4x4 matrix with specified columns.
-	 *
-	 * @param col1
-	 *            Vector with values of the first column
-	 * @param col2
-	 *            Vector with values of the second column
-	 * @param col3
-	 *            Vector with values of the third column
-	 * @param col4
-	 *            Vector with values of the fourth column
-	 */
+	public Matrix4f(Matrix4f other){
+		copy(other);
+	}
 	public Matrix4f(Vector4f col1, Vector4f col2, Vector4f col3, Vector4f col4){
 		m00 = col1.x;
 		m10 = col1.y;
@@ -217,38 +126,24 @@ public class Matrix4f{
 		m23 = col4.z;
 		m33 = col4.w;
 	}
-	/**
-	 * Adds this matrix to another matrix.
-	 *
-	 * @param other
-	 *            The other matrix
-	 * @return Sum of this + other
-	 */
-	public Matrix4f add(Matrix4f other){
-		Matrix4f result = new Matrix4f();
-		result.m00 = m00+other.m00;
-		result.m10 = m10+other.m10;
-		result.m20 = m20+other.m20;
-		result.m30 = m30+other.m30;
-		result.m01 = m01+other.m01;
-		result.m11 = m11+other.m11;
-		result.m21 = m21+other.m21;
-		result.m31 = m31+other.m31;
-		result.m02 = m02+other.m02;
-		result.m12 = m12+other.m12;
-		result.m22 = m22+other.m22;
-		result.m32 = m32+other.m32;
-		result.m03 = m03+other.m03;
-		result.m13 = m13+other.m13;
-		result.m23 = m23+other.m23;
-		result.m33 = m33+other.m33;
-		return result;
+	public void add(Matrix4f other){
+		m00 += other.m00;
+		m01 += other.m01;
+		m02 += other.m02;
+		m03 += other.m03;
+		m10 += other.m10;
+		m11 += other.m11;
+		m12 += other.m12;
+		m13 += other.m13;
+		m20 += other.m20;
+		m21 += other.m21;
+		m22 += other.m22;
+		m23 += other.m23;
+		m30 += other.m30;
+		m31 += other.m31;
+		m32 += other.m32;
+		m33 += other.m33;
 	}
-	/**
-	 * Returns the Buffer representation of this vector.
-	 *
-	 * @return Vector as FloatBuffer
-	 */
 	public FloatBuffer getBuffer(){
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
 		buffer.put(m00).put(m10).put(m20).put(m30);
@@ -258,41 +153,25 @@ public class Matrix4f{
 		buffer.flip();
 		return buffer;
 	}
-	/**
-	 * Multiplies this matrix with a scalar.
-	 *
-	 * @param scalar
-	 *            The scalar
-	 * @return Scalar product of this * scalar
-	 */
-	public Matrix4f multiply(float scalar){
-		Matrix4f result = new Matrix4f();
-		result.m00 = m00*scalar;
-		result.m10 = m10*scalar;
-		result.m20 = m20*scalar;
-		result.m30 = m30*scalar;
-		result.m01 = m01*scalar;
-		result.m11 = m11*scalar;
-		result.m21 = m21*scalar;
-		result.m31 = m31*scalar;
-		result.m02 = m02*scalar;
-		result.m12 = m12*scalar;
-		result.m22 = m22*scalar;
-		result.m32 = m32*scalar;
-		result.m03 = m03*scalar;
-		result.m13 = m13*scalar;
-		result.m23 = m23*scalar;
-		result.m33 = m33*scalar;
-		return result;
+	public void multiply(float s){
+		m00 *= s;
+		m01 *= s;
+		m02 *= s;
+		m03 *= s;
+		m10 *= s;
+		m11 *= s;
+		m12 *= s;
+		m13 *= s;
+		m20 *= s;
+		m21 *= s;
+		m22 *= s;
+		m23 *= s;
+		m30 *= s;
+		m31 *= s;
+		m32 *= s;
+		m33 *= s;
 	}
-	/**
-	 * Multiplies this matrix to another matrix.
-	 *
-	 * @param other
-	 *            The other matrix
-	 * @return Matrix product of this * other
-	 */
-	public Matrix4f multiply(Matrix4f other){
+	public void multiply(Matrix4f other){
 		Matrix4f result = new Matrix4f();
 		result.m00 = m00*other.m00+m01*other.m10+m02*other.m20+m03*other.m30;
 		result.m10 = m10*other.m00+m11*other.m10+m12*other.m20+m13*other.m30;
@@ -310,34 +189,40 @@ public class Matrix4f{
 		result.m13 = m10*other.m03+m11*other.m13+m12*other.m23+m13*other.m33;
 		result.m23 = m20*other.m03+m21*other.m13+m22*other.m23+m23*other.m33;
 		result.m33 = m30*other.m03+m31*other.m13+m32*other.m23+m33*other.m33;
-		return result;
+		copy(result);
 	}
-	/**
-	 * Multiplies this matrix to a vector.
-	 *
-	 * @param vector
-	 *            The vector
-	 * @return Vector product of this * other
-	 */
-	public Vector4f multiply(Vector4f vector){
+	public void copy(Matrix4f other){
+		m00 = other.m00;
+		m01 = other.m01;
+		m02 = other.m02;
+		m03 = other.m03;
+		m10 = other.m10;
+		m11 = other.m11;
+		m12 = other.m12;
+		m13 = other.m13;
+		m20 = other.m20;
+		m21 = other.m21;
+		m22 = other.m22;
+		m23 = other.m23;
+		m30 = other.m30;
+		m31 = other.m31;
+		m32 = other.m32;
+		m33 = other.m33;
+	}
+	public void multiply(Vector4f vector){
 		float x = m00*vector.x+m01*vector.y+m02*vector.z+m03*vector.w;
 		float y = m10*vector.x+m11*vector.y+m12*vector.z+m13*vector.w;
 		float z = m20*vector.x+m21*vector.y+m22*vector.z+m23*vector.w;
 		float w = m30*vector.x+m31*vector.y+m32*vector.z+m33*vector.w;
-		return new Vector4f(x, y, z, w);
+		vector.x = x;
+		vector.y = y;
+		vector.z = z;
+		vector.w = w;
 	}
-	/**
-	 * Negates this matrix.
-	 *
-	 * @return Negated matrix
-	 */
-	public Matrix4f negate(){
-		return multiply(-1f);
+	public void negate(){
+		multiply(-1f);
 	}
-	/**
-	 * Sets this matrix to the identity matrix.
-	 */
-	public final void setIdentity(){
+	public void setIdentity(){
 		m00 = 1f;
 		m11 = 1f;
 		m22 = 1f;
@@ -355,22 +240,30 @@ public class Matrix4f{
 		m31 = 0f;
 		m32 = 0f;
 	}
-	/**
-	 * Subtracts this matrix from another matrix.
-	 *
-	 * @param other
-	 *            The other matrix
-	 * @return Difference of this - other
-	 */
-	public Matrix4f subtract(Matrix4f other){
-		return add(other.negate());
+	public void translate(float x, float y, float z){
+		m03 += x;
+		m13 += y;
+		m23 += z;
 	}
-	/**
-	 * Transposes this matrix.
-	 *
-	 * @return Transposed matrix
-	 */
-	public Matrix4f transpose(){
+	public void subtract(Matrix4f other){
+		m00 -= other.m00;
+		m01 -= other.m01;
+		m02 -= other.m02;
+		m03 -= other.m03;
+		m10 -= other.m10;
+		m11 -= other.m11;
+		m12 -= other.m12;
+		m13 -= other.m13;
+		m20 -= other.m20;
+		m21 -= other.m21;
+		m22 -= other.m22;
+		m23 -= other.m23;
+		m30 -= other.m30;
+		m31 -= other.m31;
+		m32 -= other.m32;
+		m33 -= other.m33;
+	}
+	public void transpose(){
 		Matrix4f result = new Matrix4f();
 		result.m00 = m00;
 		result.m10 = m01;
@@ -388,6 +281,6 @@ public class Matrix4f{
 		result.m13 = m31;
 		result.m23 = m32;
 		result.m33 = m33;
-		return result;
+		copy(result);
 	}
 }
